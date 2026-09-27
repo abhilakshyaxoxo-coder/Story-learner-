@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Film Story Generator</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #171a21;
+    --accent: #e8b64c;
+    --text: #f2f2f2;
+    --muted: #9aa0aa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .wrap { width: 100%; max-width: 640px; }
+  h1 {
+    text-align: center;
+    letter-spacing: 2px;
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+  }
+  .sub {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 28px;
+    font-family: system-ui, sans-serif;
+    font-size: 0.9rem;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid #2a2f3a;
+    border-radius: 12px;
+    padding: 24px;
+  }
+  label {
+    display: block;
+    font-family: system-ui, sans-serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+  label:first-of-type { margin-top: 0; }
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #33394a;
+    background: #0f1115;
+    color: var(--text);
+    font-size: 1rem;
+    font-family: system-ui, sans-serif;
+  }
+  input:focus { outline: none; border-color: var(--accent); }
+  button {
+    width: 100%;
+    margin-top: 22px;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #1a1a1a;
+    font-weight: bold;
+    font-size: 1rem;
+    font-family: system-ui, sans-serif;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  button:hover:not(:disabled) { opacity: 0.9; }
+  .credit {
+    text-align: center;
+    color: var(--muted);
+    font-family: system-ui, sans-serif;
+    font-size: 0.8rem;
+  }
+  header.credit { margin-bottom: 20px; }
+  footer.credit { margin-top: 28px; }
+  #result {
+    margin-top: 24px;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 1rem;
+    display: none;
+  }
+  #error {
+    margin-top: 16px;
+    color: #f28b82;
+    font-family: system-ui, sans-serif;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .spinner {
+    display: none;
+    margin: 20px auto 0;
+    width: 24px;
+    height: 24px;
+    border: 3px solid #33394a;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+  <header class="credit">Made and built by Abhi Lakshya</header>
+  <div class="wrap">
+    <h1>🎬 Film Story Generator</h1>
+    <div class="sub">Turn any topic into a three-act film story</div>
+
+    <div class="card">
+      <label for="topic">Topic</label>
+      <input id="topic" type="text" placeholder="e.g. a lighthouse keeper who finds a message in a bottle" />
+
+      <label for="genre">Genre</label>
+      <input id="genre" type="text" placeholder="e.g. thriller, comedy, sci-fi" />
+
+      <button id="generateBtn">Generate Story</button>
+      <div class="spinner" id="spinner"></div>
+      <div id="error"></div>
+      <div id="result"></div>
+    </div>
+  </div>
+  <footer class="credit">Made and built by Abhi Lakshya</footer>
+
+  <script>
+    // Relative path — works locally (python main.py) and on Render,
+    // since the backend now serves this page itself.
+    const API_URL = "/generate";
+
+    const btn = document.getElementById("generateBtn");
+    const topicInput = document.getElementById("topic");
+    const genreInput = document.getElementById("genre");
+    const resultEl = document.getElementById("result");
+    const errorEl = document.getElementById("error");
+    const spinner = document.getElementById("spinner");
+
+    async function generateStory() {
+      const topic = topicInput.value.trim();
+      const genre = genreInput.value.trim();
+
+      errorEl.style.display = "none";
+      resultEl.style.display = "none";
+
+      if (!topic || !genre) {
+        errorEl.textContent = "Please fill in both the topic and genre.";
+        errorEl.style.display = "block";
+        return;
+      }
+
+      btn.disabled = true;
+      spinner.style.display = "block";
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topic, genre }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Something went wrong.");
+        }
+
+        resultEl.textContent = data.story;
+        resultEl.style.display = "block";
+      } catch (err) {
+        errorEl.textContent = err.message || "Failed to reach the server.";
+        errorEl.style.display = "block";
+      } finally {
+        btn.disabled = false;
+        spinner.style.display = "none";
+      }
+    }
+
+    btn.addEventListener("click", generateStory);
+    genreInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") generateStory();
+    });
+  </script>
+</body>
+</html>
