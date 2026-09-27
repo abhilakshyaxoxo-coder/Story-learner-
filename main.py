@@ -4,10 +4,10 @@ from flask_cors import CORS
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 
-# Set your key as an environment variable instead of hardcoding it.
-# Locally:   export GROQ_API_KEY="your-key-here"
-# On Render: add it under Environment > Environment Variables in the dashboard.
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+# Hardcoded for a throwaway 24-hour key. Swap back to os.environ.get("GROQ_API_KEY")
+# and set it externally if you ever reuse this with a real, longer-lived key.
+GROQ_API_KEY = "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"
+os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 
 if not GROQ_API_KEY:
     raise RuntimeError(
@@ -70,3 +70,4 @@ def home():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render sets PORT for you
     app.run(host="0.0.0.0", port=port)
+    
