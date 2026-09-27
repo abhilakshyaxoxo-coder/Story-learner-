@@ -20,7 +20,7 @@ CORS(app)  # harmless to keep even when frontend + backend share an origin
 llm = ChatGroq(
     model="openai/gpt-oss-120b",
     temperature=0.4,
-    max_tokens=250,
+    max_tokens=1000,
 )
 
 prompt = ChatPromptTemplate.from_template(
