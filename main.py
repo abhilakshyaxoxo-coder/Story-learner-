@@ -6,7 +6,6 @@ from langchain_core.prompts import ChatPromptTemplate
 
 # Hardcoded for a throwaway 24-hour key. Swap back to os.environ.get("GROQ_API_KEY")
 # and set it externally if you ever reuse this with a real, longer-lived key.
-GROQ_API_KEY = "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"
 os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 
 if not GROQ_API_KEY:
