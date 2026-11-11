@@ -4,10 +4,7 @@ from flask_cors import CORS
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 
-# Hardcoded for a throwaway 24-hour key. Swap back to os.environ.get("GROQ_API_KEY")
-# and set it externally if you ever reuse this with a real, longer-lived key.
-os.environ["GROQ_API_KEY"] = GROQ_API_KEY
-
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 if not GROQ_API_KEY:
     raise RuntimeError(
         "GROQ_API_KEY not set. Set it as an environment variable before running."
